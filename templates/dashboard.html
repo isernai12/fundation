@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block header_title %}Overview Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <!-- Total Members Card -->
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="stat-details">
+                <div class="stat-label">Total Members</div>
+                <h3 class="stat-value">{{ member_count }}</h3>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Funds Card -->
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon bg-success bg-opacity-10 text-success">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
+            </div>
+            <div class="stat-details">
+                <div class="stat-label">Total Funds Collected</div>
+                <h3 class="stat-value">${{ "%.2f"|format(total_funds) }}</h3>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Active Projects Card (Placeholder) -->
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon bg-info bg-opacity-10 text-info">
+                <i class="fa-solid fa-list-check"></i>
+            </div>
+            <div class="stat-details">
+                <div class="stat-label">Active Projects</div>
+                <h3 class="stat-value">3</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center bg-white">
+        <span class="fw-semibold">Recent Members</span>
+        <a href="{{ url_for('users_list') }}" class="btn btn-sm btn-outline-primary">View All</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Join Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in recent_members %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-light rounded-circle p-2 text-secondary">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <span class="fw-medium">{{ member.name }}</span>
+                        </div>
+                    </td>
+                    <td class="text-muted">{{ member.email }}</td>
+                    <td>{{ member.join_date.strftime('%Y-%m-%d') }}</td>
+                    <td><span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">{{ member.status }}</span></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center py-4 text-muted">No members found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

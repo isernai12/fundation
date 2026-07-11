@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block header_title %}Manage Users{% endblock %}
+
+{% block content %}
+<div class="glass" style="padding: 1.5rem;">
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">Select a user to edit or remove from the system.</p>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <button class="btn" style="width: auto; padding: 0.25rem 0.75rem; font-size: 0.85rem; background: var(--sidebar-bg); border: 1px solid var(--border-color);">Edit</button>
+                        <button class="btn" style="width: auto; padding: 0.25rem 0.75rem; font-size: 0.85rem; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">Delete</button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3">No users to manage.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

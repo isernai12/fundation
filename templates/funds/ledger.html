@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block header_title %}Fund Ledger{% endblock %}
+
+{% block content %}
+<div class="glass" style="padding: 1.5rem;">
+    <h3>Detailed Transaction History</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Fund Name</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ledger in ledgers %}
+                <tr>
+                    <td>{{ ledger.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        {% if ledger.transaction_type == 'IN' %}
+                            <span style="color: #34d399; font-weight: bold;">+ IN</span>
+                        {% else %}
+                            <span style="color: #f87171; font-weight: bold;">- OUT</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ ledger.fund.name }}</td>
+                    <td style="{% if ledger.transaction_type == 'IN' %}color: #34d399;{% else %}color: #f87171;{% endif %}">
+                        ${{ "%.2f"|format(ledger.amount) }}
+                    </td>
+                    <td>{{ ledger.description }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">No transactions recorded.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
