@@ -128,6 +128,7 @@ class Member(db.Model):
     
     funds = db.relationship('Fund', backref='donor', lazy=True)
     ledgers = db.relationship('MemberLedger', backref='member', lazy=True)
+    contributions = db.relationship('MemberContribution', backref='member', lazy=True)
 
 class FundSource(db.Model):
     __tablename__ = 'fund_sources'
@@ -598,7 +599,7 @@ def edit_member(id):
             flash(f'Image upload failed: {str(e)}', 'error')
             
         if safe_commit():
-            flash('সদস্যের তথ্য সফলভাবে আপডেট করা হয়েছে।', 'success')
+            flash('Member information updated successfully.', 'success')
             return redirect(url_for('member_profile', id=member.id))
             
     return render_template('edit_member.html', member=member, fund_sources=FundSource.query.all())
@@ -948,22 +949,31 @@ def contrib_collect():
         fund_source_id = request.form.get('fund_source_id')
         contrib = db.session.get(MemberContribution, contrib_id)
         if contrib:
-            pay = MemberContributionPayment(contribution_id=contrib.id, paid_amount=paid, payment_method=pmethod, collector=current_user.full_name, remarks=remarks, fund_source_id=fund_source_id)
-            db.session.add(pay)
-            
-            total_paid = sum(p.paid_amount for p in contrib.payments) + paid
-            if total_paid >= contrib.expected_amount:
-                contrib.status = 'Paid'
-            else:
-                contrib.status = 'Partial'
+            try:
+                member_obj = db.session.get(Member, contrib.member_id)
+                member_name = member_obj.full_name if member_obj else "Unknown"
                 
-            add_ledger_entry(contrib.member_id, 'মাসিক অনুদান', f"{contrib.month}/{contrib.year} মাসের অনুদান প্রদান", credit=paid, remarks=request.form.get('remarks', ''))
-            if fund_source_id:
-                add_fund_source_ledger(fund_source_id, 'মাসিক অনুদান', f"{contrib.member.full_name} এর {contrib.month}/{contrib.year} অনুদান", credit=paid, member_id=contrib.member_id, remarks=remarks)
-            
-            if safe_commit():
-                flash('Contribution collected successfully', 'success')
-                return redirect(url_for('contrib_history'))
+                pay = MemberContributionPayment(contribution_id=contrib.id, paid_amount=paid, payment_method=pmethod, collector=current_user.full_name, remarks=remarks, fund_source_id=fund_source_id)
+                db.session.add(pay)
+                
+                total_paid = sum(p.paid_amount for p in contrib.payments) + paid
+                if total_paid >= contrib.expected_amount:
+                    contrib.status = 'Paid'
+                else:
+                    contrib.status = 'Partial'
+                    
+                add_ledger_entry(contrib.member_id, 'মাসিক অনুদান', f"{contrib.month}/{contrib.year} মাসের অনুদান প্রদান", credit=paid, remarks=request.form.get('remarks', ''))
+                if fund_source_id:
+                    add_fund_source_ledger(fund_source_id, 'মাসিক অনুদান', f"{member_name} এর {contrib.month}/{contrib.year} অনুদান", credit=paid, member_id=contrib.member_id, remarks=remarks)
+                
+                if safe_commit():
+                    flash('Contribution collected successfully', 'success')
+                    return redirect(url_for('contrib_history'))
+            except Exception as e:
+                db.session.rollback()
+                import traceback
+                logging.error(f"Error collecting contribution: {str(e)}\n{traceback.format_exc()}")
+                flash('Something went wrong while collecting the contribution. Please try again.', 'error')
             
     dues = MemberContribution.query.filter(MemberContribution.status.in_(['Due', 'Partial'])).all()
     for d in dues:
