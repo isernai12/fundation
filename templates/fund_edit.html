@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block header_title %}Edit Fund Entry{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+        <h3 class="text-base font-semibold text-slate-800">সম্পাদনা Fund Record</h3>
+    </div>
+    <form action="{{ url_for('fund_edit', id=fund.id) }}" method="POST" class="p-6 space-y-6">
+        
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            
+            <div class="sm:col-span-2">
+                <label for="member_id" class="block text-sm font-medium text-slate-700 mb-1">Donating User / Member *</label>
+                <select id="member_id" name="member_id" required class="block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
+                    {% for user in members %}
+                        <option value="{{ member.id }}" {% if fund.member_id == member.id %}selected{% endif %}>{{ member.full_name }} ({{ user.email }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="source_id" class="block text-sm font-medium text-slate-700 mb-1">Fund Source / Category *</label>
+                <select id="source_id" name="source_id" required class="block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
+                    {% for source in sources %}
+                        <option value="{{ source.id }}" {% if fund.source_id == source.id %}selected{% endif %}>{{ source.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="amount" class="block text-sm font-medium text-slate-700 mb-1">পরিমাণ ($) *</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                        <i data-lucide="dollar-sign" class="h-4 w-4"></i>
+                    </div>
+                    <input type="number" step="0.01" min="0" name="amount" id="amount" value="{{ fund.amount }}" required class="block w-full pl-9 pr-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="description" class="block text-sm font-medium text-slate-700 mb-1">Description / Notes</label>
+                <textarea id="description" name="description" rows="3" class="block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ fund.description or '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-200 flex justify-end">
+            <a href="{{ url_for('fund_manage') }}" class="bg-white border border-slate-300 rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none mr-3">
+                বাতিল
+            </a>
+            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none">
+                Update Fund
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

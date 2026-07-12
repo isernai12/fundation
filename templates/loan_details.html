@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block header_title %}Loan Details & Schedule{% endblock %}
+{% block content %}
+<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div>
+            <p class="text-sm text-gray-500">Beneficiary</p>
+            <p class="font-bold text-gray-900">{{ loan.beneficiary.name }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Total পরিমাণ</p>
+            <p class="font-bold text-gray-900">${{ "%.2f"|format(loan.amount) }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Monthly Installment</p>
+            <p class="font-bold text-gray-900">${{ "%.2f"|format(loan.monthly_installment) }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">অবস্থা</p>
+            <p class="font-bold text-gray-900">{{ loan.status }}</p>
+        </div>
+    </div>
+</div>
+
+<h3 class="text-lg font-bold text-gray-800 mb-4">Installment Schedule</h3>
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <table class="w-full text-left border-collapse">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">#</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Due Date</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">পরিমাণ</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">অবস্থা</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Payment Date</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            {% for i in loan.installments %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ i.installment_number }}</td>
+                <td class="px-6 py-4 text-sm text-gray-600">{{ i.due_date.strftime('%Y-%m-%d') }}</td>
+                <td class="px-6 py-4 text-sm font-bold text-gray-700">${{ "%.2f"|format(i.amount) }}</td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium 
+                        {% if i.status == 'Paid' %}bg-green-100 text-green-700
+                        {% elif i.status == 'Partial' %}bg-yellow-100 text-yellow-700
+                        {% else %}bg-red-100 text-red-700{% endif %}">
+                        {{ i.status }}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-600">
+                    {% if i.payment_date %}{{ i.payment_date.strftime('%Y-%m-%d') }}{% else %}-{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

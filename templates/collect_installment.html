@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block header_title %}Collect Installment{% endblock %}
+{% block content %}
+<div class="max-w-2xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+    <form method="POST" action="{{ url_for('collect_installment') }}" class="space-y-6">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Select Due Installment</label>
+            <select name="installment_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                <option value="">-- Select Installment --</option>
+                {% for i in installments %}
+                <option value="{{ i.id }}">{{ i.loan.beneficiary.name }} (Inst #{{ i.installment_number }}) - Due: ${{ "%.2f"|format(i.amount) }} on {{ i.due_date }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Collection পরিমাণ ($)</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="text-gray-500">$</span>
+                </div>
+                <input type="number" step="0.01" name="amount" required class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+            </div>
+        </div>
+        <div class="flex justify-end pt-4">
+            <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">Record Payment</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

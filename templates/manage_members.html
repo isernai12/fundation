@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block header_title %}Manage Organization Members{% endblock %}
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div class="relative w-full max-w-md">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </span>
+        <input type="text" id="searchInput" onkeyup="filterMembers()" placeholder="অনুসন্ধান by ID, নাম, Phone, পেশা, or Address..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary outline-none">
+    </div>
+    <a href="{{ url_for('add_member') }}" class="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-blue-700 shadow-sm">Add New Member</a>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <table class="w-full text-left border-collapse" id="membersTable">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">ID</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">নাম</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Phone</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">অবস্থা</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase text-right">পদক্ষেপ</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            {% for m in members %}
+            <tr class="hover:bg-gray-50 member-row" data-search="{{ m.member_id_str }} {{ m.full_name }} {{ m.phone }} {{ m.profession }} {{ m.present_address }} {{ m.permanent_address }}">
+                <td class="px-6 py-4 text-sm text-gray-600">{{ m.member_id_str or '-' }}</td>
+                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ m.full_name }}</td>
+                <td class="px-6 py-4 text-sm text-gray-600">{{ m.phone }}</td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium {% if m.status == 'Active' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                        {{ m.status }}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-sm text-right space-x-2">
+                    <a href="{{ url_for('member_profile', id=m.id) }}" class="text-blue-600 hover:text-blue-900 font-medium">দেখুন</a>
+                    <form action="{{ url_for('delete_member', id=m.id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to permanently delete this member? All their data and images will be removed.');">
+                        <button type="submit" class="text-red-600 hover:text-red-900 font-medium ml-2">মুছে ফেলুন</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function filterMembers() {
+    let input = document.getElementById('searchInput').value.toLowerCase();
+    let rows = document.getElementsByClassনাম('member-row');
+    for (let i = 0; i < rows.length; i++) {
+        let searchData = rows[i].getAttribute('data-search').toLowerCase();
+        if (searchData.indexOf(input) > -1) {
+            rows[i].style.display = "";
+        } else {
+            rows[i].style.display = "none";
+        }
+    }
+}
+</script>
+{% endblock %}

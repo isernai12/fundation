@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block header_title %}{{ source.name }} - লেজার{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        
+        <div class="p-4 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-50">
+            <div>
+                <h3 class="font-bold text-gray-800">{{ source.name }} এর লেজার</h3>
+                <p class="text-sm text-gray-500">বর্তমান ব্যালেন্স: ৳ {{ "{:,.2f}".format(source.balance) }}</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="window.print()" class="px-3 py-1.5 bg-white border border-gray-200 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-50 shadow-sm flex items-center">
+                    প্রিন্ট লেজার
+                </button>
+                <button onclick="exportTableToCSV('fund_ledger_{{ source.id }}.csv')" class="px-3 py-1.5 bg-white border border-green-200 text-green-600 rounded-md text-sm font-medium hover:bg-green-50 shadow-sm flex items-center">
+                    Excel এক্সপোর্ট
+                </button>
+            </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600" id="ledgerTable">
+                <thead class="bg-gray-50 text-gray-700 text-xs uppercase font-semibold border-b">
+                    <tr>
+                        <th class="px-4 py-3">তারিখ</th>
+                        <th class="px-4 py-3">রেফারেন্স</th>
+                        <th class="px-4 py-3">লেনদেনের ধরন</th>
+                        <th class="px-4 py-3">সদস্য / বিবরণ</th>
+                        <th class="px-4 py-3 text-right">ডেবিট (খরচ) ৳</th>
+                        <th class="px-4 py-3 text-right">ক্রেডিট (জমা) ৳</th>
+                        <th class="px-4 py-3 text-right">ব্যালেন্স (৳)</th>
+                        <th class="px-4 py-3">মন্তব্য</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <!-- Opening Balance Row -->
+                    <tr class="bg-blue-50">
+                        <td class="px-4 py-3 whitespace-nowrap">-</td>
+                        <td class="px-4 py-3">-</td>
+                        <td class="px-4 py-3 font-medium">প্রারম্ভিক ব্যালেন্স</td>
+                        <td class="px-4 py-3">-</td>
+                        <td class="px-4 py-3 text-right">-</td>
+                        <td class="px-4 py-3 text-right font-medium text-green-600">{{ "{:,.2f}".format(source.opening_balance) }}</td>
+                        <td class="px-4 py-3 text-right font-bold text-gray-800">{{ "{:,.2f}".format(source.opening_balance) }}</td>
+                        <td class="px-4 py-3 text-xs text-gray-500"></td>
+                    </tr>
+                    
+                    {% for l in ledgers %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-4 py-3 whitespace-nowrap">{{ l.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td class="px-4 py-3 text-xs text-gray-500">{{ l.reference_number or '-' }}</td>
+                        <td class="px-4 py-3"><span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-xs font-medium">{{ l.transaction_type }}</span></td>
+                        <td class="px-4 py-3">
+                            {% if l.member_id %}
+                            <a href="{{ url_for('member_view', id=l.member_id) }}" class="text-primary hover:underline font-medium">সদস্য #{{ l.member_id }}</a><br>
+                            {% endif %}
+                            <span class="text-xs text-gray-500">{{ l.description }}</span>
+                        </td>
+                        <td class="px-4 py-3 text-right {% if l.debit > 0 %}text-red-600 font-medium{% endif %}">{{ "{:,.2f}".format(l.debit) if l.debit else '-' }}</td>
+                        <td class="px-4 py-3 text-right {% if l.credit > 0 %}text-green-600 font-medium{% endif %}">{{ "{:,.2f}".format(l.credit) if l.credit else '-' }}</td>
+                        <td class="px-4 py-3 text-right font-bold text-gray-800">{{ "{:,.2f}".format(l.balance) }}</td>
+                        <td class="px-4 py-3 text-xs text-gray-500">{{ l.remarks or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function exportTableToCSV(filename) {
+    var csv = [];
+    var rows = document.querySelectorAll("table#ledgerTable tr");
+    for (var i = 0; i < rows.length; i++) {
+        var row = [], cols = rows[i].querySelectorAll("td, th");
+        for (var j = 0; j < cols.length; j++) row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+        csv.push(row.join(","));        
+    }
+    var csvFile = new Blob([csv.join("\n")], {type: "text/csv"});
+    var downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+}
+</script>
+{% endblock %}

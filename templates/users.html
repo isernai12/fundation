@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block header_title %}All Users{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+        <h3 class="text-base font-semibold text-slate-800">User Directory</h3>
+        <a href="{{ url_for('user_add') }}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+            <i data-lucide="plus" class="mr-1.5 h-4 w-4"></i> Add New
+        </a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">নাম</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">যোগাযোগ Info</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">অবস্থা</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">যোগদানের তারিখ</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-slate-200">
+                {% for user in members %}
+                <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="h-8 w-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs mr-3">
+                                {{ member.full_name[:2].upper() }}
+                            </div>
+                            <div class="text-sm font-medium text-slate-900">{{ member.full_name }}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-slate-900">{{ user.email }}</div>
+                        <div class="text-xs text-slate-500">{{ user.phone or 'N/A' }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if user.status == 'Active' %}bg-green-100 text-green-800{% else %}bg-slate-100 text-slate-800{% endif %}">
+                            {{ user.status }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                        {{ user.joined_date.strftime('%Y-%m-%d') }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="px-6 py-8 text-center text-slate-500 text-sm">No members found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block header_title %}Fund Report{% endblock %}
+{% block content %}
+<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+    <h3 class="text-lg font-bold text-gray-800 mb-4">Overall Fund Summary</h3>
+    {% set total = namespace(value=0) %}
+    {% for fund in funds %}
+        {% set total.value = total.value + fund.amount %}
+    {% endfor %}
+    
+    <div class="p-6 bg-green-50 rounded-xl border border-green-100 inline-block mb-6">
+        <p class="text-sm text-green-800 font-medium mb-1">Total Inflow পরিমাণ</p>
+        <p class="text-3xl font-bold text-green-700">${{ "%.2f"|format(total.value) }}</p>
+    </div>
+
+    <p class="text-gray-600 text-sm">Detailed report can be exported from the ledger.</p>
+</div>
+{% endblock %}

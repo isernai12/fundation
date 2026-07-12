@@ -1,0 +1,443 @@
+{% extends 'base.html' %}
+{% block header_title %}Add New Member{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100">
+    
+    <!-- Progress Indicator -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center relative">
+            <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 z-0"></div>
+            <div class="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-primary z-0 transition-all duration-300" id="progress-bar" style="width: 0%"></div>
+            
+            <div class="step-indicator relative z-10 flex flex-col items-center" data-step="1">
+                <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-semibold border-4 border-white shadow">1</div>
+                <span class="text-xs mt-2 font-medium text-gray-700 hidden md:block">Personal</span>
+            </div>
+            <div class="step-indicator relative z-10 flex flex-col items-center" data-step="2">
+                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-semibold border-4 border-white shadow transition-colors">2</div>
+                <span class="text-xs mt-2 font-medium text-gray-500 hidden md:block">যোগাযোগ</span>
+            </div>
+            <div class="step-indicator relative z-10 flex flex-col items-center" data-step="3">
+                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-semibold border-4 border-white shadow transition-colors">3</div>
+                <span class="text-xs mt-2 font-medium text-gray-500 hidden md:block">Education</span>
+            </div>
+            <div class="step-indicator relative z-10 flex flex-col items-center" data-step="4">
+                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-semibold border-4 border-white shadow transition-colors">4</div>
+                <span class="text-xs mt-2 font-medium text-gray-500 hidden md:block">Foundation</span>
+            </div>
+            <div class="step-indicator relative z-10 flex flex-col items-center" data-step="5">
+                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-semibold border-4 border-white shadow transition-colors">5</div>
+                <span class="text-xs mt-2 font-medium text-gray-500 hidden md:block">Emergency</span>
+            </div>
+            <div class="step-indicator relative z-10 flex flex-col items-center" data-step="6">
+                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-semibold border-4 border-white shadow transition-colors">6</div>
+                <span class="text-xs mt-2 font-medium text-gray-500 hidden md:block">Review</span>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('add_member') }}" enctype="multipart/form-data" id="wizard-form">
+        
+        <!-- Step 1: Personal -->
+        <div class="step-content block" data-step="1">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Section 1: ব্যক্তিগত তথ্য</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">পূর্ণ নাম <span class="text-red-500">*</span></label>
+                    <input type="text" name="full_name" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">পিতার নাম <span class="text-red-500">*</span></label>
+                    <input type="text" name="fathers_name" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">মাতার নাম</label>
+                    <input type="text" name="mothers_name" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">জন্ম তারিখ <span class="text-red-500">*</span></label>
+                    <input type="date" name="dob" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">রক্তের গ্রুপ <span class="text-red-500">*</span></label>
+                    <select name="blood_group" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                        <option value="">Select...</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">বৈবাহিক অবস্থা <span class="text-red-500">*</span></label>
+                    <select name="marital_status" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                        <option value="">Select...</option>
+                        <option value="অবিবাহিত">অবিবাহিত</option>
+                        <option value="বিবাহিত">বিবাহিত</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Contact -->
+        <div class="step-content hidden" data-step="2">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Section 2: যোগাযোগের তথ্য</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">মোবাইল নম্বর <span class="text-red-500">*</span></label>
+                    <input type="text" name="phone" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">হোয়াটসঅ্যাপ নম্বর</label>
+                    <input type="text" name="whatsapp_number" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল ঠিকানা</label>
+                    <input type="email" name="email" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">বর্তমান ঠিকানা <span class="text-red-500">*</span></label>
+                    <textarea name="present_address" required rows="2" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary"></textarea>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">স্থায়ী ঠিকানা <span class="text-red-500">*</span></label>
+                    <textarea name="permanent_address" required rows="2" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Education & Profession -->
+        <div class="step-content hidden" data-step="3">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Section 3: শিক্ষা ও পেশা</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">সর্বোচ্চ শিক্ষা <span class="text-red-500">*</span></label>
+                    <select name="education" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                        <option value="">Select...</option>
+                        <option value="SSC">SSC</option>
+                        <option value="HSC">HSC</option>
+                        <option value="Diploma">Diploma</option>
+                        <option value="Bachelor">Bachelor</option>
+                        <option value="Masters">Masters</option>
+                        <option value="অন্যান্য">অন্যান্য</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">পেশা <span class="text-red-500">*</span></label>
+                    <select id="profession-select" name="profession" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary" onchange="toggleOtherProfession()">
+                        <option value="">Select...</option>
+                        <option value="চাকরি">চাকরি</option>
+                        <option value="ব্যবসা">ব্যবসা</option>
+                        <option value="শিক্ষক">শিক্ষক</option>
+                        <option value="শিক্ষার্থী">শিক্ষার্থী</option>
+                        <option value="ফ্রিল্যান্সার">ফ্রিল্যান্সার</option>
+                        <option value="কৃষক">কৃষক</option>
+                        <option value="ডাক্তার">ডাক্তার</option>
+                        <option value="প্রকৌশলী">প্রকৌশলী</option>
+                        <option value="আইনজীবী">আইনজীবী</option>
+                        <option value="গৃহিণী">গৃহিণী</option>
+                        <option value="অন্যান্য">অন্যান্য</option>
+                    </select>
+                </div>
+                <div id="other-profession-wrapper" class="hidden md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Specify অন্যান্য পেশা <span class="text-red-500">*</span></label>
+                    <input type="text" id="other-profession-input" name="profession_other" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">প্রতিষ্ঠান / কর্মস্থল</label>
+                    <input type="text" name="organization" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">বিশেষ দক্ষতা</label>
+                    <textarea name="special_skills" rows="2" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary" placeholder="E.g., Event Management, Graphic Design, Public Speaking..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Foundation -->
+        <div class="step-content hidden" data-step="4">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Section 4: ফাউন্ডেশন সম্পর্কিত তথ্য</h2>
+            <div class="grid grid-cols-1 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ডিফল্ট তহবিল (Default Fund Source) <span class="text-red-500">*</span></label>
+                    <select name="fund_source_id" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary no-bn">
+                        <option value="">তহবিল নির্বাচন করুন</option>
+                        {% for fs in fund_sources %}
+                        <option value="{{ fs.id }}">{{ fs.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">How did you know about the foundation? <span class="text-red-500">*</span></label>
+                    <select name="foundation_source" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                        <option value="">Select...</option>
+                        <option value="Friend">Friend</option>
+                        <option value="Social Media">Social Media</option>
+                        <option value="Existing Member">Existing Member</option>
+                        <option value="Campaign">Campaign</option>
+                        <option value="অন্যান্য">অন্যান্য</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">সদস্য হওয়ার উদ্দেশ্য <span class="text-red-500">*</span></label>
+                    <textarea name="purpose_of_joining" required rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Which activities are you interested in? (Select all that apply)</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <label class="flex items-center space-x-3">
+                            <input type="checkbox" name="activities" value="Monthly Contribution" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                            <span class="text-gray-700 text-sm">Monthly Contribution</span>
+                        </label>
+                        <label class="flex items-center space-x-3">
+                            <input type="checkbox" name="activities" value="Volunteer Work" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                            <span class="text-gray-700 text-sm">Volunteer Work</span>
+                        </label>
+                        <label class="flex items-center space-x-3">
+                            <input type="checkbox" name="activities" value="Humanitarian কার্যক্রম" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                            <span class="text-gray-700 text-sm">Humanitarian কার্যক্রম</span>
+                        </label>
+                        <label class="flex items-center space-x-3">
+                            <input type="checkbox" name="activities" value="Social Awareness" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                            <span class="text-gray-700 text-sm">Social Awareness</span>
+                        </label>
+                        <label class="flex items-center space-x-3">
+                            <input type="checkbox" name="activities" value="Emergency Response" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                            <span class="text-gray-700 text-sm">Emergency Response</span>
+                        </label>
+                        <label class="flex items-center space-x-3">
+                            <input type="checkbox" name="activities" value="অন্যান্য" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                            <span class="text-gray-700 text-sm">অন্যান্য</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Emergency Contact -->
+        <div class="step-content hidden" data-step="5">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Section 5: জরুরি যোগাযোগ</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">জরুরি যোগাযোগ নাম <span class="text-red-500">*</span></label>
+                    <input type="text" name="emergency_contact_name" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">সম্পর্ক <span class="text-red-500">*</span></label>
+                    <input type="text" name="emergency_contact_relation" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">মোবাইল নম্বর <span class="text-red-500">*</span></label>
+                    <input type="text" name="emergency_contact_phone" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6: Review & Submit -->
+        <div class="step-content hidden" data-step="6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Section 6: Uploads & Declaration</h2>
+            
+            <div class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">প্রোফাইল ছবি</label>
+                    <input type="file" name="photo_file" accept=".jpg,.jpeg,.png,.webp" onchange="previewImage(this, 'photo_preview')" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm mb-2">
+                    <img id="photo_preview" class="hidden w-full h-auto rounded border" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">জাতীয় পরিচয়পত্র (Front)</label>
+                    <input type="file" name="nid_front_file" accept=".jpg,.jpeg,.png,.webp" onchange="previewImage(this, 'nid_front_preview')" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm mb-2">
+                    <img id="nid_front_preview" class="hidden w-full h-auto rounded border" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">জাতীয় পরিচয়পত্র (Back)</label>
+                    <input type="file" name="nid_back_file" accept=".jpg,.jpeg,.png,.webp" onchange="previewImage(this, 'nid_back_preview')" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm mb-2">
+                    <img id="nid_back_preview" class="hidden w-full h-auto rounded border" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">স্বাক্ষরের ছবি</label>
+                    <input type="file" name="signature_file" accept=".jpg,.jpeg,.png,.webp" onchange="previewImage(this, 'signature_preview')" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm mb-2">
+                    <img id="signature_preview" class="hidden w-full h-auto rounded border" />
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg border mb-6">
+                <h3 class="font-medium text-gray-800 mb-2">Declaration</h3>
+                <p class="text-sm text-gray-600 mb-4 text-justify">
+                    I hereby declare that all the information provided in this form is true and correct to the best of my knowledge. I understand that any false information may lead to the termination of the membership. I also agree to abide by the rules, regulations, and policies of the organization.
+                </p>
+                <label class="flex items-start space-x-3 cursor-pointer">
+                    <input type="checkbox" name="declaration" id="declaration-check" required class="mt-1 w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded">
+                    <span class="text-gray-800 font-medium text-sm">I agree with the organization's objectives and policies. <span class="text-red-500">*</span></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between pt-6 mt-4 border-t border-gray-100">
+            <button type="button" id="prev-btn" class="hidden px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">পূর্ববর্তী</button>
+            <button type="button" id="save-draft-btn" class="px-6 py-2 text-primary font-medium hover:underline hidden">সংরক্ষণ করুন Draft</button>
+            <div class="ml-auto">
+                <button type="button" id="next-btn" class="px-6 py-2 bg-primary text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">পরবর্তী Step</button>
+                <button type="submit" id="submit-btn" class="hidden px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">সদস্য সংরক্ষণ করুন</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const totalSteps = 6;
+        let currentStep = 1;
+        const form = document.getElementById("wizard-form");
+        const nextBtn = document.getElementById("next-btn");
+        const prevBtn = document.getElementById("prev-btn");
+        const submitBtn = document.getElementById("submit-btn");
+        const progressBar = document.getElementById("progress-bar");
+        const declCheck = document.getElementById("declaration-check");
+
+        function updateUI() {
+            // Update steps visibility
+            document.querySelectorAll(".step-content").forEach(el => {
+                el.classList.add("hidden");
+                if (parseInt(el.dataset.step) === currentStep) {
+                    el.classList.remove("hidden");
+                }
+            });
+
+            // Update step indicators
+            document.querySelectorAll(".step-indicator").forEach(el => {
+                const step = parseInt(el.dataset.step);
+                const circle = el.querySelector("div");
+                const text = el.querySelector("span");
+                
+                if (step < currentStep) {
+                    circle.className = "w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold border-4 border-white shadow transition-colors";
+                    circle.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+                    text.classList.add("text-gray-700");
+                    text.classList.remove("text-gray-500", "text-primary");
+                } else if (step === currentStep) {
+                    circle.classনাম = "w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-semibold border-4 border-white shadow transition-colors";
+                    circle.innerHTML = step;
+                    text.classList.add("text-primary");
+                    text.classList.remove("text-gray-500", "text-gray-700");
+                } else {
+                    circle.classনাম = "w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-semibold border-4 border-white shadow transition-colors";
+                    circle.innerHTML = step;
+                    text.classList.add("text-gray-500");
+                    text.classList.remove("text-primary", "text-gray-700");
+                }
+            });
+
+            // Update Progress Bar
+            progressBar.style.width = ((currentStep - 1) / (totalSteps - 1)) * 100 + "%";
+
+            // Update Buttons
+            if (currentStep === 1) {
+                prevBtn.classList.add("hidden");
+            } else {
+                prevBtn.classList.remove("hidden");
+            }
+
+            if (currentStep === totalSteps) {
+                nextBtn.classList.add("hidden");
+                submitBtn.classList.remove("hidden");
+            } else {
+                nextBtn.classList.remove("hidden");
+                submitBtn.classList.add("hidden");
+            }
+        }
+
+        // Validate step inputs before proceeding
+        function validateStep() {
+            const stepContent = document.querySelector(`.step-content[data-step="${currentStep}"]`);
+            const inputs = stepContent.querySelectorAll("input[required], select[required], textarea[required]");
+            let valid = true;
+            inputs.forEach(input => {
+                if (!input.checkValidity()) {
+                    input.reportValidity();
+                    valid = false;
+                }
+            });
+            return valid;
+        }
+
+        nextBtn.addEventListener("click", () => {
+            if (validateStep() && currentStep < totalSteps) {
+                currentStep++;
+                updateUI();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+
+        prevBtn.addEventListener("click", () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateUI();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+        
+        // Disable submit button until checkbox is checked
+        declCheck.addEventListener("change", function() {
+            submitBtn.disabled = !this.checked;
+        });
+        
+        // Ensure initial state
+        submitBtn.disabled = !declCheck.checked;
+        updateUI();
+    });
+
+    function toggleঅন্যান্যপেশা() {
+        const select = document.getElementById('profession-select');
+        const wrapper = document.getElementById('other-profession-wrapper');
+        const input = document.getElementById('other-profession-input');
+        if (select.value === 'অন্যান্য') {
+            wrapper.classList.remove('hidden');
+            input.setAttribute('required', 'required');
+        } else {
+            wrapper.classList.add('hidden');
+            input.removeAttribute('required');
+        }
+    }
+
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        const file = input.files[0];
+        if (file) {
+            // Validate size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                alert("File is too large. Maximum size is 5MB.");
+                input.value = "";
+                preview.classList.add("hidden");
+                preview.src = "";
+                return;
+            }
+            
+            // Validate type
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                alert("Invalid file type. Only JPG, PNG, and WEBP are allowed.");
+                input.value = "";
+                preview.classList.add("hidden");
+                preview.src = "";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove("hidden");
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+            preview.classList.add("hidden");
+        }
+    }
+</script>
+{% endblock %}

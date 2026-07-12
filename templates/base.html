@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foundation Management সিস্টেম</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .sidebar { transition: all 0.3s; }
+        .submenu { 
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .submenu.active { 
+            max-height: 500px;
+            transition: max-height 0.5s ease-in;
+        }
+        .chevron { transition: transform 0.3s; }
+        .chevron.active { transform: rotate(180deg); }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#475569',
+                        success: '#16a34a',
+                        warning: '#ea580c',
+                        danger: '#dc2626',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="text-gray-800 flex h-screen overflow-hidden">
+    
+    {% if current_user.is_authenticated %}
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-72 bg-white shadow-lg flex flex-col h-full sidebar border-r border-gray-100 z-50 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out">
+        <div class="h-16 flex items-center justify-between px-6 border-b border-gray-100 shrink-0">
+            <div class="flex items-center">
+                <i data-lucide="building-2" class="text-primary w-6 h-6 mr-2"></i>
+                <span class="text-xl font-bold text-gray-800">FMS</span>
+            </div>
+            <!-- Mobile Close Button -->
+            <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-gray-700 focus:outline-none">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto py-4">
+            <nav class="space-y-1 px-3">
+                <!-- Dashboard -->
+                <a href="{{ url_for('dashboard') }}" class="flex items-center px-3 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-primary rounded-lg font-medium transition-colors whitespace-nowrap overflow-hidden gap-3">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 flex-shrink-0"></i>
+                    <span class="truncate">ড্যাশবোর্ড</span>
+                </a>
+
+
+                <!-- Organization Members -->
+                <div class="relative">
+                    <button onclick="toggleMenu('member-menu', this)" class="w-full flex items-center justify-between px-3 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-primary rounded-lg font-medium transition-colors">
+                        <div class="flex items-center gap-3 whitespace-nowrap overflow-hidden">
+                            <i data-lucide="users" class="w-5 h-5 flex-shrink-0"></i>
+                            <span class="truncate">সদস্য ব্যবস্থাপনা</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-4 h-4 chevron"></i>
+                    </button>
+                    <div id="member-menu" class="submenu pl-10 pr-3 space-y-1 mt-1">
+                        <a href="{{ url_for('add_member') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">নতুন সদস্য যোগ করুন</a>
+                        <a href="{{ url_for('members') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">সদস্য তালিকা</a>
+                        <a href="{{ url_for('member_ledger') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Member Ledger</a>
+                        <a href="{{ url_for('assign_default_fund_source') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">তহবিল বরাদ্দ (Bulk Assign)</a>
+                    </div>
+                </div>
+
+                <!-- Member Contributions -->
+                <div class="relative">
+                    <button onclick="toggleMenu('contrib-menu', this)" class="w-full flex items-center justify-between px-3 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-primary rounded-lg font-medium transition-colors">
+                        <div class="flex items-center gap-3 whitespace-nowrap overflow-hidden">
+                            <i data-lucide="piggy-bank" class="w-5 h-5 flex-shrink-0"></i>
+                            <span class="truncate">Member অনুদান</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-4 h-4 chevron"></i>
+                    </button>
+                    <div id="contrib-menu" class="submenu pl-10 pr-3 space-y-1 mt-1">
+                        
+                        <a href="{{ url_for('contrib_settings') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">সেটিংস</a>
+                        <a href="{{ url_for('contrib_manage') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Manage</a>
+                        <a href="{{ url_for('contrib_collect') }}"
+ class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">অনুদান সংগ্রহ</a>
+                        <a href="{{ url_for('contrib_history') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">অনুদানের ইতিহাস</a>
+                        <a href="{{ url_for('contrib_due') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Due Members</a>
+                        <a href="{{ url_for('contrib_ledger') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">অনুদান লেজার</a>
+                        <a href="{{ url_for('contrib_report') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">অনুদান রিপোর্ট</a>
+                    </div>
+                </div>
+
+                <!-- Fund Source -->
+                <div class="relative">
+                    <button onclick="toggleMenu('source-menu', this)" class="w-full flex items-center justify-between px-3 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-primary rounded-lg font-medium transition-colors">
+                        <div class="flex items-center gap-3 whitespace-nowrap overflow-hidden">
+                            <i data-lucide="map-pin" class="w-5 h-5 flex-shrink-0"></i>
+                            <span class="truncate">তহবিলের উৎস</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-4 h-4 chevron"></i>
+                    </button>
+                    <div id="source-menu" class="submenu pl-10 pr-3 space-y-1 mt-1">
+                        <a href="{{ url_for('add_source') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Add Source</a>
+                        <a href="{{ url_for('fund_sources_dashboard') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">তহবিলসমূহ</a>
+                        <a href="{{ url_for('source_report') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Source Report</a>
+                        <a href="{{ url_for('source_ledger') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Source Ledger</a>
+                    </div>
+                </div>
+
+                <!-- Fund Management -->
+                <div class="relative">
+                    <button onclick="toggleMenu('fund-menu', this)" class="w-full flex items-center justify-between px-3 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-primary rounded-lg font-medium transition-colors">
+                        <div class="flex items-center gap-3 whitespace-nowrap overflow-hidden">
+                            <i data-lucide="wallet" class="w-5 h-5 flex-shrink-0"></i>
+                            <span class="truncate">তহবিল ব্যবস্থাপনা</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-4 h-4 chevron"></i>
+                    </button>
+                    <div id="fund-menu" class="submenu pl-10 pr-3 space-y-1 mt-1">
+                        <a href="{{ url_for('add_fund') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Add Fund</a>
+                        <a href="{{ url_for('manage_funds') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Manage Funds</a>
+                        <a href="{{ url_for('fund_report') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Fund Report</a>
+                        <a href="{{ url_for('fund_ledger') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Fund Ledger</a>
+                    </div>
+                </div>
+
+                <!-- Assistance -->
+                <div class="relative">
+                    <button onclick="toggleMenu('assistance-menu', this)" class="w-full flex items-center justify-between px-3 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-primary rounded-lg font-medium transition-colors">
+                        <div class="flex items-center gap-3 whitespace-nowrap overflow-hidden">
+                            <i data-lucide="gift" class="w-5 h-5 flex-shrink-0"></i>
+                            <span class="truncate">সহায়তা</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-4 h-4 chevron"></i>
+                    </button>
+                    <div id="assistance-menu" class="submenu pl-10 pr-3 space-y-1 mt-1">
+                        <a href="{{ url_for('add_assist_beneficiary') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Add Beneficiary</a>
+                        <a href="{{ url_for('issue_assistance') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Issue সহায়তা</a>
+                        <a href="{{ url_for('assistance_report') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">সহায়তা Report</a>
+                    </div>
+                </div>
+
+                <!-- Loan -->
+                <div class="relative">
+                    <button onclick="toggleMenu('loan-menu', this)" class="w-full flex items-center justify-between px-3 py-2.5 text-gray-700 hover:bg-blue-50 hover:text-primary rounded-lg font-medium transition-colors">
+                        <div class="flex items-center gap-3 whitespace-nowrap overflow-hidden">
+                            <i data-lucide="banknote" class="w-5 h-5 flex-shrink-0"></i>
+                            <span class="truncate">ঋণ</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-4 h-4 chevron"></i>
+                    </button>
+                    <div id="loan-menu" class="submenu pl-10 pr-3 space-y-1 mt-1">
+                        <a href="{{ url_for('add_loan_beneficiary') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Add Beneficiary</a>
+                        <a href="{{ url_for('issue_loan') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Issue ঋণ</a>
+                        <a href="{{ url_for('collect_installment') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">Collect Installment</a>
+                        <a href="{{ url_for('loan_report') }}" class="block truncate whitespace-nowrap px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-blue-50 rounded-md">ঋণ Report</a>
+                    </div>
+                </div>
+
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-gray-100">
+            <div class="flex items-center mb-3 px-2">
+                <div class="w-8 h-8 rounded-full bg-blue-100 text-primary flex items-center justify-center font-bold mr-3">
+                    {{ current_user.full_name[0] if current_user.full_name else "U" }}
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-800">{{ current_user.full_name }}</p>
+
+                </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="flex items-center justify-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-red-100">
+                <i data-lucide="log-out" class="w-4 h-4 mr-2"></i> লগ আউট
+            </a>
+        </div>
+    </aside>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        
+        <!-- Mobile Overlay -->
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden transition-opacity"></div>
+
+        <!-- Top Header for mobile/desktop layout if needed -->
+        {% if current_user.is_authenticated %}
+        <header class="h-16 bg-white shadow-sm flex items-center px-6 z-10 w-full shrink-0">
+            <button onclick="toggleSidebar()" class="md:hidden mr-4 text-gray-600 hover:text-primary focus:outline-none">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+            <h1 class="text-lg font-semibold text-gray-800 truncate">{% block header_title %}ড্যাশবোর্ড{% endblock %}</h1>
+            <div class="ml-auto">
+                <!-- Add anything for header right side -->
+            </div>
+        </header>
+        {% endif %}
+
+        <div class="flex-1 overflow-y-auto p-6">
+            <!-- Flash Messages -->
+            <div class="mb-6">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="p-4 rounded-lg shadow-sm mb-4 flex items-center 
+                                {% if category == 'error' %} bg-red-50 border-l-4 border-red-500 text-red-700 
+                                {% else %} bg-green-50 border-l-4 border-green-500 text-green-700 {% endif %}">
+                                {% if category == 'error' %}
+                                    <i data-lucide="alert-circle" class="w-5 h-5 mr-3"></i>
+                                {% else %}
+                                    <i data-lucide="check-circle-2" class="w-5 h-5 mr-3"></i>
+                                {% endif %}
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar) {
+                sidebar.classList.toggle('-translate-x-full');
+            }
+            if (overlay) {
+                overlay.classList.toggle('hidden');
+            }
+        }
+
+        // Dropdown Toggle
+        function toggleMenu(menuId, btn) {
+            const menu = document.getElementById(menuId);
+            const chevron = btn.querySelector('.chevron');
+            
+            // ঐচ্ছিক: close other menus
+            /*
+            document.querySelectorAll('.submenu').forEach(el => {
+                if(el.id !== menuId) {
+                    el.classList.remove('active');
+                    el.previousElementSibling.querySelector('.chevron').classList.remove('active');
+                }
+            });
+            */
+            
+            menu.classList.toggle('active');
+            chevron.classList.toggle('active');
+        }
+
+        // Bengali Numerals Conversion
+        document.addEventListener("DOMContentLoaded", function() {
+            const engToBn = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯'};
+            function traverse(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    let text = node.nodeValue;
+                    if (/\d/.test(text)) {
+                        node.nodeValue = text.replace(/\d/g, match => engToBn[match]);
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    let tag = node.nodeName.toLowerCase();
+                    if (tag === 'script' || tag === 'style' || tag === 'input' || tag === 'textarea' || tag === 'select' || node.classList.contains('no-bn')) {
+                        return;
+                    }
+                    for (let i = 0; i < node.childNodes.length; i++) {
+                        traverse(node.childNodes[i]);
+                    }
+                }
+            }
+            traverse(document.body);
+        });
+    </script>
+</body>
+</html>

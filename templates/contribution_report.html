@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block header_title %}Member Contributions Report{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <p class="text-sm font-medium text-gray-500">মোট সদস্য</p>
+        <h3 class="text-2xl font-bold text-gray-800 mt-1">{{ tot_members }}</h3>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <p class="text-sm font-medium text-gray-500">Collection Rate</p>
+        <h3 class="text-2xl font-bold text-blue-600 mt-1">{{ "%.1f"|format(pct) }}%</h3>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <p class="text-sm font-medium text-gray-500">Current Month Expected</p>
+        <h3 class="text-2xl font-bold text-purple-600 mt-1">${{ "%.2f"|format(mon_exp) }}</h3>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <p class="text-sm font-medium text-gray-500">Current Month Collected</p>
+        <h3 class="text-2xl font-bold text-green-600 mt-1">${{ "%.2f"|format(mon_col) }}</h3>
+    </div>
+    
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <p class="text-sm font-medium text-gray-500">Total Outstanding Due</p>
+        <h3 class="text-2xl font-bold text-red-600 mt-1">${{ "%.2f"|format(out_due) }}</h3>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <p class="text-sm font-medium text-gray-500">Fully Paid Members</p>
+        <h3 class="text-2xl font-bold text-green-600 mt-1">{{ fully_paid_members }}</h3>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <p class="text-sm font-medium text-gray-500">Members with Due</p>
+        <h3 class="text-2xl font-bold text-red-600 mt-1">{{ due_members }}</h3>
+    </div>
+</div>
+{% endblock %}

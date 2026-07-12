@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block header_title %}Due Members{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <table class="w-full text-left border-collapse">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Member নাম</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Total Paid</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Outstanding Due</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase text-right">পদক্ষেপ</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            {% for d in due_members %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ d.member.full_name }}</td>
+                <td class="px-6 py-4 text-sm text-gray-600">${{ "%.2f"|format(d.total_paid) }}</td>
+                <td class="px-6 py-4 text-sm font-bold text-red-600">${{ "%.2f"|format(d.total_due) }}</td>
+                <td class="px-6 py-4 text-sm text-right">
+                    <a href="{{ url_for('contrib_collect') }}" class="text-blue-600 hover:underline">Collect</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

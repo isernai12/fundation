@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block header_title %}Manage Funds{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-200">
+                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Donor</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Source</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">পরিমাণ</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for fund in funds %}
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm text-gray-600">{{ fund.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ fund.donor.name }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">{{ fund.source.name }}</span>
+                    </td>
+                    <td class="px-6 py-4 text-sm font-bold text-green-600 text-right">${{ "%.2f"|format(fund.amount) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

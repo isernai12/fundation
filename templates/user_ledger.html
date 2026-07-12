@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block header_title %}User Ledger{% endblock %}
+{% block content %}
+<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+    <p class="text-gray-600 mb-6">Detailed ledger for each user (donations made).</p>
+    
+    <div class="space-y-6">
+        {% for user in members %}
+        <div class="border border-gray-200 rounded-lg p-5">
+            <h3 class="text-lg font-bold text-gray-800 mb-3"><i data-lucide="user" class="inline w-5 h-5 mr-2"></i>{{ member.full_name }} ({{ user.username }})</h3>
+            {% if user.funds %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="px-4 py-2 font-medium text-gray-600">Date</th>
+                            <th class="px-4 py-2 font-medium text-gray-600">Source</th>
+                            <th class="px-4 py-2 font-medium text-gray-600">পরিমাণ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fund in user.funds %}
+                        <tr class="border-t border-gray-100">
+                            <td class="px-4 py-2 text-gray-600">{{ fund.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td class="px-4 py-2 text-gray-600">{{ fund.source.name }}</td>
+                            <td class="px-4 py-2 font-medium text-green-600">${{ "%.2f"|format(fund.amount) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-sm text-gray-500 italic">No funds contributed yet.</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

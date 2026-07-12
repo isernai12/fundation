@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block header_title %}Dashboard Overview{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+        <div class="w-14 h-14 rounded-full bg-purple-50 flex items-center justify-center mr-4 text-purple-600">
+            <i data-lucide="gift" class="w-7 h-7"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-500">Total সহায়তা পরিমাণ</p>
+            <h3 class="text-2xl font-bold text-gray-800">${{ "%.2f"|format(tot_assist) }}</h3>
+        </div>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+        <div class="w-14 h-14 rounded-full bg-purple-50 flex items-center justify-center mr-4 text-purple-600">
+            <i data-lucide="members" class="w-7 h-7"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-500">Total সহায়তা Beneficiaries</p>
+            <h3 class="text-2xl font-bold text-gray-800">{{ tot_assist_b }}</h3>
+        </div>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+        <div class="w-14 h-14 rounded-full bg-purple-50 flex items-center justify-center mr-4 text-purple-600">
+            <i data-lucide="clock" class="w-7 h-7"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-500">Pending সহায়তা</p>
+            <h3 class="text-2xl font-bold text-gray-800">{{ pend_assist }}</h3>
+        </div>
+    </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+        <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mr-4 text-blue-600">
+            <i data-lucide="banknote" class="w-7 h-7"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-500">Total ঋণ পরিমাণ</p>
+            <h3 class="text-2xl font-bold text-gray-800">${{ "%.2f"|format(tot_loan) }}</h3>
+        </div>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+        <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mr-4 text-blue-600">
+            <i data-lucide="activity" class="w-7 h-7"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-500">Running ঋণ</p>
+            <h3 class="text-2xl font-bold text-gray-800">{{ run_loans }}</h3>
+        </div>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+        <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mr-4 text-blue-600">
+            <i data-lucide="check-circle" class="w-7 h-7"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-500">Collected Installments</p>
+            <h3 class="text-2xl font-bold text-gray-800">${{ "%.2f"|format(col_inst) }}</h3>
+        </div>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+        <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mr-4 text-blue-600">
+            <i data-lucide="pie-chart" class="w-7 h-7"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-500">Outstanding Balance</p>
+            <h3 class="text-2xl font-bold text-gray-800">${{ "%.2f"|format(out_bal) }}</h3>
+        </div>
+    </div>
+</div>
+{% endblock %}

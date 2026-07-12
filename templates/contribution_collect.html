@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block header_title %}অনুদান গ্রহণ (Collect Member Contribution){% endblock %}
+{% block content %}
+
+{% if first_time %}
+<div class="max-w-2xl bg-white p-8 rounded-xl shadow-sm border border-orange-200 mb-8">
+    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+        <i data-lucide="info" class="text-orange-500 w-5 h-5 mr-2"></i>
+        First Time Setup প্রয়োজনীয়
+    </h3>
+    <p class="text-sm text-gray-600 mb-6">নিচের অ্যাক্টিভ সদস্যদের জন্য এখনো মাসিক অনুদানের পরিমাণ নির্ধারণ করা হয়নি। অনুদান নেওয়ার আগে তাদের মাসিক পরিমাণ নির্ধারণ করুন।</p>
+    
+    <form method="POST" action="{{ url_for('contrib_collect') }}" class="space-y-4">
+        <input type="hidden" name="is_first_time" value="1">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">সদস্য নির্বাচন করুন</label>
+                <select name="new_member_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                    {% for m in first_time %}
+                    <option value="{{ m.id }}">{{ m.full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">মাসিক পরিমাণ (৳)</label>
+                <input type="number" step="0.01" name="new_monthly_amount" value="100.00" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none no-bn">
+            </div>
+        </div>
+        <div class="flex justify-end pt-2">
+            <button type="submit" class="bg-orange-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-orange-600 transition-colors shadow-sm">সংরক্ষণ করুন & Generate Due</button>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+<div class="max-w-2xl bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+    <h3 class="text-lg font-bold text-gray-800 mb-4">অনুদান গ্রহণ করুন</h3>
+    <form method="POST" action="{{ url_for('contrib_collect') }}" class="space-y-6">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">বকেয়া অনুদান নির্বাচন করুন <span class="text-red-500">*</span></label>
+            <select name="contribution_id" id="contribution_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                <option value="">-- সদস্য ও মাস নির্বাচন করুন --</option>
+                {% for d in dues %}
+                <option value="{{ d.id }}" data-fund-source="{{ d.member.fund_source_id or '' }}">{{ d.member.full_name }} - {{ d.month }}/{{ d.year }} (বকেয়া: ৳ {{ "%.2f"|format(d.remaining) }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <!-- Fund Source Selection -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">তহবিল (Fund Source) <span class="text-red-500">*</span></label>
+            
+            {% if fund_sources|length == 0 %}
+            <div class="bg-red-50 text-red-700 p-4 rounded-lg flex items-center justify-between">
+                <div>
+                    <i data-lucide="alert-circle" class="w-5 h-5 inline mr-1"></i> No Fund Source found. Please create a Fund Source first.
+                </div>
+                <a href="{{ url_for('add_source') }}" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">+ Create Fund Source</a>
+            </div>
+            {% else %}
+            <select name="fund_source_id" id="fund_source_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none no-bn">
+                <option value="">-- তহবিল নির্বাচন করুন --</option>
+                {% for fs in fund_sources %}
+                <option value="{{ fs.id }}">{{ fs.name }}</option>
+                {% endfor %}
+            </select>
+            <p class="text-xs text-gray-500 mt-1" id="fund_helper_text">Default fund source selected automatically.</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">প্রদানের পরিমাণ (৳) <span class="text-red-500">*</span></label>
+            <input type="number" step="0.01" name="paid_amount" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none no-bn">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">প্রদানের মাধ্যম <span class="text-red-500">*</span></label>
+            <select name="payment_method" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                <option value="Cash">ক্যাশ</option>
+                <option value="Bank">ব্যাংক ট্রান্সফার</option>
+                <option value="Mobile">মোবাইল ব্যাংকিং (বিকাশ/নগদ)</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">মন্তব্য (ঐচ্ছিক)</label>
+            <textarea name="remarks" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"></textarea>
+        </div>
+        <div class="flex justify-end pt-4">
+            <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm" {% if fund_sources|length == 0 %}disabled{% endif %}>Record Collection</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const contributionSelect = document.getElementById('contribution_id');
+        const fundSourceSelect = document.getElementById('fund_source_id');
+        
+        if(contributionSelect && fundSourceSelect) {
+            contributionSelect.addEventListener('change', function() {
+                const selectedOption = contributionSelect.options[contributionSelect.selectedIndex];
+                const fundSourceId = selectedOption.getAttribute('data-fund-source');
+                
+                if (fundSourceId) {
+                    fundSourceSelect.value = fundSourceId;
+                    
+                    // Trigger a highlight effect to show it was automatically changed
+                    fundSourceSelect.classList.add('ring-2', 'ring-green-500');
+                    setTimeout(() => {
+                        fundSourceSelect.classList.remove('ring-2', 'ring-green-500');
+                    }, 800);
+                } else {
+                    fundSourceSelect.value = "";
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

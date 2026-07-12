@@ -1,0 +1,368 @@
+{% extends 'base.html' %}
+{% block header_title %}Edit Member: {{ member.full_name }}{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-6">
+    <div class="flex justify-between items-center">
+        <a href="{{ url_for('member_profile', id=member.id) }}" class="text-blue-600 hover:text-blue-800 font-medium">&larr; Back to সদস্যের প্রোফাইল</a>
+        <h2 class="text-xl font-semibold text-gray-800">সদস্যের তথ্য সম্পাদনা Details</h2>
+    </div>
+
+    <form method="POST" action="{{ url_for('edit_member', id=member.id) }}" enctype="multipart/form-data" class="space-y-4">
+        
+        <!-- Profile Photo Header -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col md:flex-row items-center md:items-start gap-6">
+            <div class="relative group flex-shrink-0">
+                {% if member.profile_photo_url %}
+                <img src="{{ member.profile_photo_url }}" class="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-gray-50 shadow-md">
+                {% else %}
+                <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gray-200 border-4 border-gray-50 shadow-md flex items-center justify-center text-gray-400">
+                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </div>
+                {% endif %}
+                
+                <div class="absolute inset-0 bg-black bg-opacity-50 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2 cursor-pointer">
+                    {% if member.profile_photo_url %}
+                    <button type="button" onclick="openModal('{{ member.profile_photo_url }}')" class="text-white text-xs font-medium hover:underline">ছবি দেখুন</button>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="flex-grow w-full text-center md:text-left space-y-4 mt-2 md:mt-4">
+                <h3 class="text-lg font-semibold text-gray-800">প্রোফাইল ছবি</h3>
+                <div class="space-y-3 max-w-sm mx-auto md:mx-0">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">নতুন ছবি আপলোড করুন</label>
+                        <input type="file" name="photo_file" accept=".jpg,.jpeg,.png,.webp" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-blue-700">
+                    </div>
+                    {% if member.profile_photo_url %}
+                    <label class="flex items-center text-sm text-red-600 font-medium justify-center md:justify-start">
+                        <input type="checkbox" name="delete_profile_photo" class="mr-2 w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"> বর্তমান ছবি মুছে ফেলুন
+                    </label>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- Personal Information -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <button type="button" onclick="toggleCard('personal-card', this)" class="w-full px-6 py-4 bg-gray-50 flex justify-between items-center text-left focus:outline-none">
+                <span class="font-semibold text-gray-800">ব্যক্তিগত তথ্য</span>
+                <svg class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="personal-card" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">পূর্ণ নাম <span class="text-red-500">*</span></label>
+                    <input type="text" name="full_name" value="{{ member.full_name }}" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">জাতীয় পরিচয়পত্র (Number)</label>
+                    <input type="text" name="nid" value="{{ member.nid or '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">পিতার নাম</label>
+                    <input type="text" name="fathers_name" value="{{ member.fathers_name or '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">মাতার নাম</label>
+                    <input type="text" name="mothers_name" value="{{ member.mothers_name or '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">জন্ম তারিখ</label>
+                    <input type="date" name="dob" value="{{ member.dob.strftime('%Y-%m-%d') if member.dob else '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">রক্তের গ্রুপ</label>
+                    <select name="blood_group" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                        <option value="" {% if not member.blood_group %}selected{% endif %}>রক্তের গ্রুপ নির্বাচন করুন</option>
+                        {% for bg in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                        <option value="{{ bg }}" {% if member.blood_group == bg %}selected{% endif %}>{{ bg }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">বৈবাহিক অবস্থা</label>
+                    <div class="flex items-center space-x-4 mt-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="marital_status" value="অবিবাহিত" {% if member.marital_status == 'Single' %}checked{% endif %} class="text-primary focus:ring-primary">
+                            <span class="ml-2 text-sm text-gray-700">অবিবাহিত</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="marital_status" value="বিবাহিত" {% if member.marital_status == 'Married' %}checked{% endif %} class="text-primary focus:ring-primary">
+                            <span class="ml-2 text-sm text-gray-700">বিবাহিত</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">যোগদানের তারিখ</label>
+                    <input type="date" name="join_date" value="{{ member.join_date.strftime('%Y-%m-%d') if member.join_date else '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <button type="button" onclick="toggleCard('contact-card', this)" class="w-full px-6 py-4 bg-gray-50 flex justify-between items-center text-left focus:outline-none">
+                <span class="font-semibold text-gray-800">যোগাযোগের তথ্য</span>
+                <svg class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="contact-card" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">মোবাইল নম্বর <span class="text-red-500">*</span></label>
+                    <input type="text" name="phone" value="{{ member.phone }}" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">হোয়াটসঅ্যাপ নম্বর</label>
+                    <input type="text" name="whatsapp_number" value="{{ member.whatsapp_number or '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল ঠিকানা</label>
+                    <input type="email" name="email" value="{{ member.email or '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">বর্তমান ঠিকানা</label>
+                    <textarea name="present_address" rows="2" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">{{ member.present_address or '' }}</textarea>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">স্থায়ী ঠিকানা</label>
+                    <textarea name="permanent_address" rows="2" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">{{ member.permanent_address or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Education & Profession -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <button type="button" onclick="toggleCard('edu-card', this)" class="w-full px-6 py-4 bg-gray-50 flex justify-between items-center text-left focus:outline-none">
+                <span class="font-semibold text-gray-800">শিক্ষা ও পেশা</span>
+                <svg class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="edu-card" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">সর্বোচ্চ শিক্ষা</label>
+                    <select name="education" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                        <option value="">শিক্ষা নির্বাচন করুন</option>
+                        {% for edu in ['SSC', 'HSC', 'Diploma', 'Bachelor', 'Masters', 'অন্যান্য'] %}
+                        <option value="{{ edu }}" {% if member.education == edu %}selected{% endif %}>{{ edu }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">পেশা <span class="text-red-500">*</span></label>
+                    {% set prof_options = ['চাকরি', 'ব্যবসা', 'শিক্ষক', 'শিক্ষার্থী', 'ফ্রিল্যান্সার', 'কৃষক', 'ডাক্তার', 'প্রকৌশলী', 'আইনজীবী', 'গৃহিণী'] %}
+                    {% set is_other_prof = member.profession and member.profession not in prof_options %}
+                    <select name="profession" id="profession-select" onchange="toggleOtherProfession()" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                        <option value="">পেশা নির্বাচন করুন</option>
+                        {% for p in prof_options %}
+                        <option value="{{ p }}" {% if member.profession == p %}selected{% endif %}>{{ p }}</option>
+                        {% endfor %}
+                        <option value="অন্যান্য" {% if is_other_prof %}selected{% endif %}>অন্যান্য</option>
+                    </select>
+                </div>
+                <div id="other-profession-wrapper" class="md:col-span-2 {% if not is_other_prof %}hidden{% endif %}">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Specify পেশা</label>
+                    <input type="text" name="profession_other" id="other-profession-input" value="{{ member.profession if is_other_prof else '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">প্রতিষ্ঠান / কর্মস্থল</label>
+                    <input type="text" name="organization" value="{{ member.organization or '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">বিশেষ দক্ষতা</label>
+                    <input type="text" name="special_skills" value="{{ member.special_skills or '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Foundation Information -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <button type="button" onclick="toggleCard('found-card', this)" class="w-full px-6 py-4 bg-gray-50 flex justify-between items-center text-left focus:outline-none">
+                <span class="font-semibold text-gray-800">ফাউন্ডেশন সম্পর্কিত তথ্য</span>
+                <svg class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="found-card" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">How did you hear about us?</label>
+                    <input type="text" name="foundation_source" value="{{ member.foundation_source or '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">সদস্য হওয়ার উদ্দেশ্য</label>
+                    <input type="text" name="purpose_of_joining" value="{{ member.purpose_of_joining or '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">আগ্রহী কার্যক্রম</label>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {% set interests = member.activities_interested.split(',') if member.activities_interested else [] %}
+                        {% for act in ['Education', 'Healthcare', 'Charity', 'Events', 'Fundraising', 'Volunteering'] %}
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="activities" value="{{ act }}" {% if act in interests %}checked{% endif %} class="text-primary focus:ring-primary border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">{{ act }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Contact -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <button type="button" onclick="toggleCard('emg-card', this)" class="w-full px-6 py-4 bg-gray-50 flex justify-between items-center text-left focus:outline-none">
+                <span class="font-semibold text-gray-800">জরুরি যোগাযোগ</span>
+                <svg class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="emg-card" class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">নাম</label>
+                    <input type="text" name="emergency_contact_name" value="{{ member.emergency_contact_name or '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">সম্পর্ক</label>
+                    <input type="text" name="emergency_contact_relation" value="{{ member.emergency_contact_relation or '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">মোবাইল নম্বর</label>
+                    <input type="text" name="emergency_contact_phone" value="{{ member.emergency_contact_phone or '' }}" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <button type="button" onclick="toggleCard('doc-card', this)" class="w-full px-6 py-4 bg-gray-50 flex justify-between items-center text-left focus:outline-none">
+                <span class="font-semibold text-gray-800">Documents</span>
+                <svg class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="doc-card" class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- NID Front -->
+                <div class="border rounded-lg p-3 bg-gray-50 flex flex-col items-center">
+                    <span class="block text-xs font-semibold text-gray-500 uppercase mb-2">জাতীয় পরিচয়পত্রের সামনের অংশ</span>
+                    {% if member.nid_front_url %}
+                    <img src="{{ member.nid_front_url }}" onclick="openModal(this.src)" class="w-full h-32 object-cover rounded shadow-sm cursor-pointer hover:opacity-80 transition-opacity mb-3">
+                    {% else %}
+                    <div class="w-full h-32 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 mb-3">কোনো নথি নেই</div>
+                    {% endif %}
+                    
+                    <div class="w-full space-y-2 mt-auto">
+                        <input type="file" name="nid_front_file" accept=".jpg,.jpeg,.png,.webp" class="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-blue-700">
+                        <label class="flex items-center text-xs text-red-600 font-medium">
+                            <input type="checkbox" name="delete_nid_front" class="mr-1"> নথি মুছে ফেলুন
+                        </label>
+                    </div>
+                </div>
+
+                <!-- NID Back -->
+                <div class="border rounded-lg p-3 bg-gray-50 flex flex-col items-center">
+                    <span class="block text-xs font-semibold text-gray-500 uppercase mb-2">জাতীয় পরিচয়পত্রের পেছনের অংশ</span>
+                    {% if member.nid_back_url %}
+                    <img src="{{ member.nid_back_url }}" onclick="openModal(this.src)" class="w-full h-32 object-cover rounded shadow-sm cursor-pointer hover:opacity-80 transition-opacity mb-3">
+                    {% else %}
+                    <div class="w-full h-32 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 mb-3">কোনো নথি নেই</div>
+                    {% endif %}
+                    
+                    <div class="w-full space-y-2 mt-auto">
+                        <input type="file" name="nid_back_file" accept=".jpg,.jpeg,.png,.webp" class="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-blue-700">
+                        <label class="flex items-center text-xs text-red-600 font-medium">
+                            <input type="checkbox" name="delete_nid_back" class="mr-1"> নথি মুছে ফেলুন
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Signature -->
+                <div class="border rounded-lg p-3 bg-gray-50 flex flex-col items-center">
+                    <span class="block text-xs font-semibold text-gray-500 uppercase mb-2">স্বাক্ষর</span>
+                    {% if member.signature_url %}
+                    <img src="{{ member.signature_url }}" onclick="openModal(this.src)" class="w-full h-32 object-contain bg-white p-1 rounded shadow-sm cursor-pointer hover:opacity-80 transition-opacity mb-3">
+                    {% else %}
+                    <div class="w-full h-32 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 mb-3">কোনো নথি নেই</div>
+                    {% endif %}
+                    
+                    <div class="w-full space-y-2 mt-auto">
+                        <input type="file" name="signature_file" accept=".jpg,.jpeg,.png,.webp" class="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-blue-700">
+                        <label class="flex items-center text-xs text-red-600 font-medium">
+                            <input type="checkbox" name="delete_signature" class="mr-1"> নথি মুছে ফেলুন
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Other Info -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-6">
+            <h3 class="font-semibold text-gray-800 mb-4">অন্যান্য & অবস্থা</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="col-span-1 md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ডিফল্ট তহবিল (Default Fund Source) <span class="text-red-500">*</span></label>
+                    <select name="fund_source_id" required class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary no-bn">
+                        <option value="" {% if not member.fund_source_id %}selected{% endif %}>Not Assigned</option>
+                        {% for fs in fund_sources %}
+                        <option value="{{ fs.id }}" {% if member.fund_source_id == fs.id %}selected{% endif %}>{{ fs.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">অবস্থা</label>
+                    <select name="status" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">
+                        <option value="সক্রিয়" {% if member.status == 'Active' %}selected{% endif %}>সক্রিয়</option>
+                        <option value="নিষ্ক্রিয়" {% if member.status == 'Inactive' %}selected{% endif %}>নিষ্ক্রিয়</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Remarks</label>
+                    <textarea name="remarks" rows="2" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary text-sm">{{ member.remarks or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-6 border-t mt-8">
+            <a href="{{ url_for('member_profile', id=member.id) }}" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors">বাতিল</a>
+            <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors shadow-sm">সংরক্ষণ করুন Changes</button>
+        </div>
+    </form>
+</div>
+
+<!-- Image Preview Modal -->
+<div id="image-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 flex items-center justify-center p-4" onclick="closeModal()">
+    <div class="relative max-w-4xl max-h-full">
+        <button onclick="closeModal()" class="absolute -top-10 right-0 text-white hover:text-gray-300">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <img id="modal-img" src="" class="max-w-full max-h-[85vh] rounded object-contain">
+    </div>
+</div>
+
+<script>
+    function toggleCard(id, btn) {
+        const card = document.getElementById(id);
+        const icon = btn.querySelector('svg');
+        if (card.classList.contains('hidden')) {
+            card.classList.remove('hidden');
+            icon.classList.remove('rotate-180');
+        } else {
+            card.classList.add('hidden');
+            icon.classList.add('rotate-180');
+        }
+    }
+
+    function toggleঅন্যান্যপেশা() {
+        const select = document.getElementById('profession-select');
+        const wrapper = document.getElementById('other-profession-wrapper');
+        const input = document.getElementById('other-profession-input');
+        if (select.value === 'অন্যান্য') {
+            wrapper.classList.remove('hidden');
+            input.setAttribute('required', 'required');
+        } else {
+            wrapper.classList.add('hidden');
+            input.removeAttribute('required');
+        }
+    }
+
+    function openModal(src) {
+        document.getElementById('modal-img').src = src;
+        document.getElementById('image-modal').classList.remove('hidden');
+    }
+    
+    function closeModal() {
+        document.getElementById('image-modal').classList.add('hidden');
+        setTimeout(() => document.getElementById('modal-img').src = "", 300);
+    }
+</script>
+{% endblock %}
